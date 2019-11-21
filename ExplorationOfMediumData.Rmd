@@ -1,0 +1,86 @@
+---
+title: "Exploration of Medium Data"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+library(tidyverse)
+library(data.table)
+library(lubridate)
+library(tibble)
+```
+
+
+```{r}
+#https://github.com/harrisonjansma/Analyzing_Medium/blob/master/Medium_EDA_expanded.ipynb
+data = fread("Medium_Clean.csv",sep=",")
+dim(data)
+```
+
+```{r}
+drops = c("V1", "url","Author_url")
+data$Date <- paste(data$Year, data$Mon, data$Day, sep="-") %>% ymd() %>% as.Date()
+data = data[,c(1:6, 109, 7:108)]
+data = subset(data, select = -c(V1, url,Author_url ,Day, Publication, Author, Image, Subtitle, Title))
+```
+
+```{r}
+insufficientFreq = names(sort(colSums(Filter(is.numeric, data)), decreasing = TRUE)[50:98])
+useNames = names(data)[!(names(data) %in% insufficientFreq)]
+data2 = data[, ..useNames]
+print(names(data2))
+```
+
+
+```{r}
+#head(data2, 70)
+dataSub = filter_at(data2, vars(c("Tag_art")), all_vars(.==1))
+summedVals = rowSums(data[,4:50])
+data = data[which( summedVals> 0)]
+summary(data2[,"Claps"])
+hist(unlist(dataSub[3]), col = 'darkgray', border = 'white')
+```
+
+
+```{r}
+
+setnames(data2, old = c("Tag_artificial-intelligence", "Tag_computer-science", "Tag_life-lessons", "Tag_machine-learning", "Tag_personal-development", "Tag_self-improvement", "Tag_social-media", "Tag_web-development"), new = c("Tag_artificial_intelligence", "Tag_computer_science", "Tag_life_lessons", "Tag_machine_learning", "Tag_personal_development", "Tag_self_improvement", "Tag_social_media", "Tag_web_development"))
+write.csv(data2, "MediumProcessed.csv")
+```
+
+
+
+```{r}
+timeData = data2 %>% 
+  gather(., key = tag, value, Tag_art:Tag_writing) %>%
+  drop_na("value")%>%
+  filter(value != 0) %>%
+  group_by(Year, Month, tag) %>%
+  summarise(Claps = mean(Claps)) %>%
+  mutate(Date = as.Date(paste(Year, Month, "01", sep = "-")))%>%
+  select(Date, tag, Claps)
+```
+```{r}
+tags = c("Tag_food", "Tag_computer_science")
+timeData %>% filter(tag %in% tags)
+timeData = as.data.frame(timeData)
+```
+
+```{r}
+write_csv(timeData, "timeData.csv")
+```
+
+
+
+
+ 
+
+
+
+
+
+

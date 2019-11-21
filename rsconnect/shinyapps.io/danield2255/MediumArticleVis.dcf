@@ -1,0 +1,13 @@
+name: MediumArticleVis
+title: MediumArticleVis
+username:
+account: danield2255
+server: shinyapps.io
+hostUrl: https://api.shinyapps.io/v1
+appId: 1504877
+bundleId: 2606057
+url: https://danield2255.shinyapps.io/MediumArticleVis/
+when: 1574310230.67425
+asMultiple: FALSE
+asStatic: FALSE
+ignoredFiles: Medium_Clean.csv|RMedium

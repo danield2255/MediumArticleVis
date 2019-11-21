@@ -1,0 +1,1 @@
+data = read.csv("Medium_Clean.csv")
